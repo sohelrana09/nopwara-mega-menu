@@ -1,0 +1,292 @@
+@model MegaMenuItemModel
+
+@{
+    Layout = "_AdminLayout";
+    var title = string.Format(T("Plugins.Widgets.NopwaraMegaMenu.EditTitle").Text, Model.MenuItemTitle);
+    ViewBag.PageTitle = title;
+    NopHtml.SetActiveMenuItemSystemName(NopwaraMegaMenuDefaults.ADMIN_MENU_SYSTEM_NAME);
+
+    //core product picker popup: writes the chosen product id/name into these elements and clicks the button
+    var productPopupRoute = new { menuItemId = Model.MenuItemId, entityIdInput = "mm-new-product-id", entityInfoBlock = "mm-new-product-name", btnId = "mm-new-product-added" };
+}
+
+<form asp-controller="NopwaraMegaMenuAdmin" asp-action="Edit" method="post" id="mega-menu-form">
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="MenuItemId" type="hidden" />
+    <input asp-for="CategoryId" type="hidden" />
+    <input asp-for="ProductIds" type="hidden" />
+
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            @title
+            <small>
+                <i class="fas fa-arrow-circle-left"></i>
+                <a asp-action="List">@T("Plugins.Widgets.NopwaraMegaMenu.BackToList")</a>
+            </small>
+        </h1>
+        <div class="float-right">
+            @if (Model.MenuItemId > 0)
+            {
+                <a asp-controller="Menu" asp-action="MenuItemEdit" asp-route-id="@Model.MenuItemId" class="btn btn-default">
+                    <i class="fas fa-pencil"></i> @T("Plugins.Widgets.NopwaraMegaMenu.EditMenuItem")
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Category" asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-default">
+                    <i class="fas fa-pencil"></i> @T("Plugins.Widgets.NopwaraMegaMenu.EditCategory")
+                </a>
+            }
+            <button type="submit" name="save" class="btn btn-primary">
+                <i class="far fa-floppy-disk"></i> @T("Admin.Common.Save")
+            </button>
+            <button type="submit" name="save-continue" class="btn btn-primary">
+                <i class="far fa-floppy-disk"></i> @T("Admin.Common.SaveContinue")
+            </button>
+            @if (Model.Id > 0)
+            {
+                <span id="mega-menu-delete" class="btn btn-danger">
+                    <i class="far fa-trash-can"></i> @T("Plugins.Widgets.NopwaraMegaMenu.Remove")
+                </span>
+            }
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+                <nop-tabs id="mega-menu-edit">
+                    <nop-tab asp-name="tab-badge" asp-title="@T("Plugins.Widgets.NopwaraMegaMenu.Tab.Badge")" asp-default="true">
+                        <div class="card-body">
+                            @(await Html.LocalizedEditorAsync<MegaMenuItemModel, MegaMenuItemLocalizedModel>("mega-menu-badge-localized",
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].BadgeText" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].BadgeText" /></div>
+                                </div>
+                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                            </div>,
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="BadgeText" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="BadgeText" /></div>
+                                </div>
+                            </div>))
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="BadgeColorId" /></div>
+                                <div class="col-md-9"><nop-select asp-for="BadgeColorId" asp-items="Model.AvailableBadgeColors" /></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="Icon" /></div>
+                                <div class="col-md-9 d-flex align-items-center">
+                                    <nop-select asp-for="Icon" asp-items="Model.AvailableIcons" />
+                                    <svg id="mm-icon-preview" class="ml-3" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </nop-tab>
+
+                    <nop-tab asp-name="tab-layout" asp-title="@T("Plugins.Widgets.NopwaraMegaMenu.Tab.Layout")">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="ShowViewAll" /></div>
+                                <div class="col-md-9"><nop-editor asp-for="ShowViewAll" /></div>
+                            </div>
+                            @(await Html.LocalizedEditorAsync<MegaMenuItemModel, MegaMenuItemLocalizedModel>("mega-menu-viewall-localized",
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].ViewAllText" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].ViewAllText" /></div>
+                                </div>
+                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                            </div>,
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="ViewAllText" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="ViewAllText" /></div>
+                                </div>
+                            </div>))
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="PanelLayoutId" /></div>
+                                <div class="col-md-9"><nop-select asp-for="PanelLayoutId" asp-items="Model.AvailablePanelLayouts" /></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="ColumnOrderId" /></div>
+                                <div class="col-md-9"><nop-select asp-for="ColumnOrderId" asp-items="Model.AvailableColumnOrders" /></div>
+                            </div>
+                        </div>
+                    </nop-tab>
+
+                    <nop-tab asp-name="tab-promo" asp-title="@T("Plugins.Widgets.NopwaraMegaMenu.Tab.Promo")">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="PromoPictureId" /></div>
+                                <div class="col-md-9"><nop-editor asp-for="PromoPictureId" /></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="PromoUrl" /></div>
+                                <div class="col-md-9"><nop-editor asp-for="PromoUrl" /></div>
+                            </div>
+                            @(await Html.LocalizedEditorAsync<MegaMenuItemModel, MegaMenuItemLocalizedModel>("mega-menu-promo-localized",
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].PromoTitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].PromoTitle" /></div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].PromoSubtitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].PromoSubtitle" /></div>
+                                </div>
+                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                            </div>,
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="PromoTitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="PromoTitle" /></div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="PromoSubtitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="PromoSubtitle" /></div>
+                                </div>
+                            </div>))
+                        </div>
+                    </nop-tab>
+
+                    <nop-tab asp-name="tab-products" asp-title="@T("Plugins.Widgets.NopwaraMegaMenu.Tab.Products")">
+                        <div class="card-body">
+                            @(await Html.LocalizedEditorAsync<MegaMenuItemModel, MegaMenuItemLocalizedModel>("mega-menu-products-localized",
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].ProductsTitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].ProductsTitle" /></div>
+                                </div>
+                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                            </div>,
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="ProductsTitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="ProductsTitle" /></div>
+                                </div>
+                            </div>))
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="ProductIds" /></div>
+                                <div class="col-md-9">
+                                    <ul id="mm-products" class="list-group mb-2" style="max-width: 560px">
+                                        @foreach (var product in Model.SelectedProducts)
+                                        {
+                                            <li class="list-group-item d-flex align-items-center" data-product-id="@product.Value">
+                                                <span class="flex-grow-1 mm-product-name">@product.Text</span>
+                                                <button type="button" class="btn btn-default btn-xs mr-1 mm-product-up" title="@T("Plugins.Widgets.NopwaraMegaMenu.MoveUp")"><i class="fas fa-arrow-up"></i></button>
+                                                <button type="button" class="btn btn-danger btn-xs mm-product-remove" title="@T("Admin.Common.Delete")"><i class="far fa-trash-can"></i></button>
+                                            </li>
+                                        }
+                                    </ul>
+                                    <input type="hidden" id="mm-new-product-id" />
+                                    <span id="mm-new-product-name" class="d-none"></span>
+                                    <input type="submit" id="mm-new-product-added" class="d-none" />
+                                    <button type="button" id="mm-add-product" class="btn btn-primary"
+                                            onclick="javascript:OpenWindow('@(Html.Raw(Url.Action("MenuItemSelectProductPopup", "Menu", productPopupRoute)))', 800, 850, true);return false;">
+                                        <i class="fas fa-plus"></i> @T("Plugins.Widgets.NopwaraMegaMenu.AddProduct")
+                                    </button>
+                                    <span class="ml-2 text-muted">@T("Plugins.Widgets.NopwaraMegaMenu.MaxProducts")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </nop-tab>
+
+                    <nop-tab asp-name="tab-content" asp-title="@T("Plugins.Widgets.NopwaraMegaMenu.Tab.Content")">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-md-3"><nop-label asp-for="ContentTopicId" /></div>
+                                <div class="col-md-9"><nop-select asp-for="ContentTopicId" asp-items="Model.AvailableTopics" /></div>
+                            </div>
+                            @(await Html.LocalizedEditorAsync<MegaMenuItemModel, MegaMenuItemLocalizedModel>("mega-menu-content-localized",
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].ContentTitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].ContentTitle" /></div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].ContentHtml" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].ContentHtml" asp-template="RichEditor" /></div>
+                                </div>
+                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                            </div>,
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="ContentTitle" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="ContentTitle" /></div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-3"><nop-label asp-for="ContentHtml" /></div>
+                                    <div class="col-md-9"><nop-editor asp-for="ContentHtml" asp-template="RichEditor" /></div>
+                                </div>
+                            </div>))
+                        </div>
+                    </nop-tab>
+                </nop-tabs>
+            </div>
+        </div>
+    </section>
+</form>
+
+@if (Model.Id > 0)
+{
+    <form asp-action="Delete" asp-route-menuItemId="@Model.MenuItemId" asp-route-categoryId="@Model.CategoryId" method="post" id="mega-menu-delete-form"></form>
+}
+
+<script>
+    $(function () {
+        //icon preview
+        var iconPaths = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.IconPaths));
+        function renderIcon() {
+            var paths = iconPaths[$('#@Html.IdFor(m => m.Icon)').val()] || [];
+            $('#mm-icon-preview').html(paths.map(function (d) {
+                return '<path stroke-linecap="round" stroke-linejoin="round" d="' + d + '"/>';
+            }).join(''));
+        }
+        $('#@Html.IdFor(m => m.Icon)').on('change', renderIcon);
+        renderIcon();
+
+        //featured products: the list is the source of the hidden ProductIds value (in display order)
+        var maxProducts = @NopwaraMegaMenuDefaults.MAX_PRODUCTS;
+        function syncProducts() {
+            var ids = $('#mm-products [data-product-id]').map(function () { return $(this).data('product-id'); }).get();
+            $('#@Html.IdFor(m => m.ProductIds)').val(ids.join(','));
+            $('#mm-add-product').prop('disabled', ids.length >= maxProducts);
+        }
+        $('#mm-products').on('click', '.mm-product-remove', function () {
+            $(this).closest('li').remove();
+            syncProducts();
+        });
+        $('#mm-products').on('click', '.mm-product-up', function () {
+            var row = $(this).closest('li');
+            row.prev().before(row);
+            syncProducts();
+        });
+        //the popup filled the hidden id/name and clicked this button
+        $('#mm-new-product-added').on('click', function (e) {
+            e.preventDefault();
+            var id = parseInt($('#mm-new-product-id').val(), 10);
+            if (!id || $('#mm-products [data-product-id="' + id + '"]').length)
+                return false;
+            var name = $('#mm-new-product-name').text();
+            var row = $('#mm-products li').first().clone();
+            if (!row.length) {
+                row = $('<li class="list-group-item d-flex align-items-center"><span class="flex-grow-1 mm-product-name"></span>' +
+                    '<button type="button" class="btn btn-default btn-xs mr-1 mm-product-up"><i class="fas fa-arrow-up"></i></button>' +
+                    '<button type="button" class="btn btn-danger btn-xs mm-product-remove"><i class="far fa-trash-can"></i></button></li>');
+            }
+            row.attr('data-product-id', id).data('product-id', id).find('.mm-product-name').text(name);
+            $('#mm-products').append(row);
+            syncProducts();
+            return false;
+        });
+        syncProducts();
+
+        $('#mega-menu-delete').on('click', function () {
+            if (confirm('@T("Admin.Common.AreYouSure").Text'))
+                $('#mega-menu-delete-form').trigger('submit');
+        });
+    });
+</script>

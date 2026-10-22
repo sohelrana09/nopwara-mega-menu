@@ -1,0 +1,11 @@
+{
+  "Group": "Widgets",
+  "FriendlyName": "Nopwara mega menu",
+  "SystemName": "Widgets.NopwaraMegaMenu",
+  "Version": "1.00",
+  "SupportedVersions": [ "5.00" ],
+  "Author": "Nopwara",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Widgets.NopwaraMegaMenu.dll",
+  "Description": "Mega menu extras for the nopCommerce 5.00 main menu: badges, icons, \"View all\" links, promo banners, featured products and HTML/topic columns, plus slide-in mobile levels. Drawn by the Nopwara theme."
+}

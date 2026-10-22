@@ -1,0 +1,73 @@
+@model MegaMenuPanelModel
+@using Nop.Core.Domain.Catalog
+@*
+    Extra columns of a main menu dropdown (widget zone nopwara_megamenu_panel, rendered by the Nopwara theme next to the
+    core grid/list columns). The mobile menu renders the same component in nopwara_megamenu_panel_mobile: promo only.
+*@
+@{
+    var mobile = ViewData["Mobile"] as bool? == true;
+}
+@if (mobile)
+{
+    if (Model.HasPromo)
+    {
+        <div class="nopwara-megamenu-promo px-4 pb-4 pt-2">
+            @await Html.PartialAsync("_Promo.cshtml", Model)
+        </div>
+    }
+    return;
+}
+<div class="nopwara-megamenu-panel flex flex-col gap-6 lg:flex-row lg:gap-8" data-menu-item="@Model.Key">
+    @if (Model.Products.Any())
+    {
+        <div class="nopwara-megamenu-products min-w-0 lg:w-[26rem] lg:shrink-0">
+            @if (!string.IsNullOrWhiteSpace(Model.ProductsTitle))
+            {
+                <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">@Model.ProductsTitle</p>
+            }
+            <ul class="grid grid-cols-2 gap-4">
+                @foreach (var product in Model.Products)
+                {
+                    var url = await NopUrl.RouteGenericUrlAsync<Product>(new { SeName = product.SeName });
+                    var picture = product.PictureModels?.FirstOrDefault();
+                    <li>
+                        <a href="@url" role="menuitem" class="group/product block rounded-lg p-2 transition-colors hover:bg-slate-50">
+                            @if (picture != null)
+                            {
+                                <img src="@picture.ImageUrl" alt="@picture.AlternateText" loading="lazy"
+                                     class="mb-2 aspect-square w-full rounded-md bg-white object-contain" />
+                            }
+                            <span class="line-clamp-2 text-sm font-medium text-slate-800 group-hover/product:text-primary-600">@product.Name</span>
+                            <span class="mt-1 flex items-baseline gap-2 text-sm">
+                                <span class="font-semibold text-slate-900">@product.ProductPrice.Price</span>
+                                @if (!string.IsNullOrEmpty(product.ProductPrice.OldPrice))
+                                {
+                                    <span class="text-xs text-slate-400 line-through">@product.ProductPrice.OldPrice</span>
+                                }
+                            </span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    @if (Model.HasContent)
+    {
+        <div class="nopwara-megamenu-content min-w-0 lg:w-72 lg:shrink-0">
+            @if (!string.IsNullOrWhiteSpace(Model.ContentTitle))
+            {
+                <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">@Model.ContentTitle</p>
+            }
+            @*topic body / HTML entered in admin*@
+            <div class="space-y-2 text-sm leading-relaxed text-slate-600 [&_a]:font-medium [&_a]:text-primary-600 [&_a:hover]:underline [&_li]:ml-4 [&_ul]:list-disc [&_h2]:text-sm [&_h2]:font-semibold [&_h2]:text-slate-900 [&_h3]:font-semibold [&_h3]:text-slate-900">
+                @Html.Raw(Model.ContentHtml)
+            </div>
+        </div>
+    }
+    @if (Model.HasPromo)
+    {
+        <div class="nopwara-megamenu-promo lg:w-64 lg:shrink-0">
+            @await Html.PartialAsync("_Promo.cshtml", Model)
+        </div>
+    }
+</div>

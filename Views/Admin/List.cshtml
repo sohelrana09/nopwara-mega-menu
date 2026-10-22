@@ -1,0 +1,87 @@
+@model MegaMenuListModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewBag.PageTitle = T("Plugins.Widgets.NopwaraMegaMenu.Title").Text;
+    NopHtml.SetActiveMenuItemSystemName(NopwaraMegaMenuDefaults.ADMIN_MENU_SYSTEM_NAME);
+}
+
+<div class="content-header clearfix">
+    <h1 class="float-left">@T("Plugins.Widgets.NopwaraMegaMenu.Title")</h1>
+    <div class="float-right">
+        <a asp-controller="Menu" asp-action="List" class="btn btn-default">
+            <i class="fas fa-bars"></i>
+            @T("Admin.ContentManagement.Menus")
+        </a>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="callout bg-gray-light no-margin">@T("Plugins.Widgets.NopwaraMegaMenu.Instructions")</div>
+        <div class="cards-group mt-3">
+            @if (!Model.Menus.Any())
+            {
+                <div class="card card-default"><div class="card-body">@T("Plugins.Widgets.NopwaraMegaMenu.NoMenus")</div></div>
+            }
+            @foreach (var menu in Model.Menus)
+            {
+                <div class="card card-default">
+                    <div class="card-header">
+                        <i class="fas fa-bars"></i>
+                        @T("Plugins.Widgets.NopwaraMegaMenu.Menu"): <strong>@menu.Name</strong>
+                        @if (!menu.Published)
+                        {
+                            <span class="badge bg-secondary ml-2">@T("Plugins.Widgets.NopwaraMegaMenu.Unpublished")</span>
+                        }
+                        <a asp-controller="Menu" asp-action="Edit" asp-route-id="@menu.Id" class="float-right">@T("Admin.Common.Edit")</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>@T("Plugins.Widgets.NopwaraMegaMenu.Item")</th>
+                                    <th style="width: 150px">@T("Plugins.Widgets.NopwaraMegaMenu.Type")</th>
+                                    <th style="width: 120px">@T("Plugins.Widgets.NopwaraMegaMenu.Template")</th>
+                                    <th>@T("Plugins.Widgets.NopwaraMegaMenu.Extras")</th>
+                                    <th style="width: 140px" class="text-center">@T("Admin.Common.Edit")</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in menu.Items)
+                                {
+                                    <tr class="@(item.Published ? null : "text-muted")">
+                                        <td style="padding-left: @(12 + item.Depth * 24)px">
+                                            @if (item.Depth > 0)
+                                            {
+                                                <i class="fas fa-level-up-alt fa-rotate-90 text-muted mr-1"></i>
+                                            }
+                                            @item.Title
+                                        </td>
+                                        <td>@item.Type</td>
+                                        <td>@item.Template</td>
+                                        <td>
+                                            @if (string.IsNullOrEmpty(item.Extras))
+                                            {
+                                                <span class="text-muted">@T("Plugins.Widgets.NopwaraMegaMenu.None")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-success"><i class="fas fa-check"></i> @item.Extras</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <a asp-action="Edit" asp-route-menuItemId="@item.MenuItemId" asp-route-categoryId="@item.CategoryId" class="btn btn-default btn-sm">
+                                                <i class="fas fa-pencil"></i> @T("Plugins.Widgets.NopwaraMegaMenu.EditExtras")
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

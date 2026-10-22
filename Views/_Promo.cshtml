@@ -1,0 +1,23 @@
+@model MegaMenuPanelModel
+@*Promo banner card: picture with the title and subtitle on a dark gradient*@
+@{
+    var hasText = !string.IsNullOrWhiteSpace(Model.PromoTitle) || !string.IsNullOrWhiteSpace(Model.PromoSubtitle);
+}
+<a href="@(string.IsNullOrEmpty(Model.PromoUrl) ? null : Model.PromoUrl)" role="menuitem"
+   class="group/promo relative block overflow-hidden rounded-xl bg-slate-100">
+    <img src="@Model.PromoImageUrl" alt="@Model.PromoTitle" loading="lazy"
+         class="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover/promo:scale-105 lg:aspect-[4/5]" />
+    @if (hasText)
+    {
+        <span class="absolute inset-x-0 bottom-0 bg-linear-to-t from-slate-950/80 via-slate-950/40 to-transparent p-4 pt-12 text-white">
+            @if (!string.IsNullOrWhiteSpace(Model.PromoTitle))
+            {
+                <span class="block text-base font-semibold leading-snug">@Model.PromoTitle</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.PromoSubtitle))
+            {
+                <span class="mt-1 block text-sm text-white/80">@Model.PromoSubtitle</span>
+            }
+        </span>
+    }
+</a>
