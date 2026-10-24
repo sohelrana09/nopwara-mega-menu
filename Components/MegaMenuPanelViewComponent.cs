@@ -1,16 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
-using Nop.Core.Domain.Catalog;
 using Nop.Plugin.Widgets.NopwaraMegaMenu.Domain;
 using Nop.Plugin.Widgets.NopwaraMegaMenu.Models;
 using Nop.Plugin.Widgets.NopwaraMegaMenu.Services;
-using Nop.Services.Catalog;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Topics;
-using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
 using Nop.Web.Models.Menus;
 
@@ -27,8 +24,6 @@ public class MegaMenuPanelViewComponent : NopViewComponent
     private readonly IAclService _aclService;
     private readonly ILocalizationService _localizationService;
     private readonly IPictureService _pictureService;
-    private readonly IProductModelFactory _productModelFactory;
-    private readonly IProductService _productService;
     private readonly IStoreMappingService _storeMappingService;
     private readonly ITopicService _topicService;
     private readonly IWorkContext _workContext;
@@ -42,8 +37,6 @@ public class MegaMenuPanelViewComponent : NopViewComponent
     public MegaMenuPanelViewComponent(IAclService aclService,
         ILocalizationService localizationService,
         IPictureService pictureService,
-        IProductModelFactory productModelFactory,
-        IProductService productService,
         IStoreMappingService storeMappingService,
         ITopicService topicService,
         IWorkContext workContext,
@@ -53,8 +46,6 @@ public class MegaMenuPanelViewComponent : NopViewComponent
         _aclService = aclService;
         _localizationService = localizationService;
         _pictureService = pictureService;
-        _productModelFactory = productModelFactory;
-        _productService = productService;
         _storeMappingService = storeMappingService;
         _topicService = topicService;
         _workContext = workContext;
@@ -85,25 +76,11 @@ public class MegaMenuPanelViewComponent : NopViewComponent
             model.PromoSubtitle = await _localizationService.GetLocalizedAsync(extras, x => x.PromoSubtitle, languageId);
         }
 
-        //featured products: same visibility rules as catalog pages, in the chosen order
-        var productIds = extras.GetProductIds();
-        if (productIds.Any())
+        //featured products: only counted here; NopwaraMegaMenuController.Products prepares them when the dropdown first opens
+        model.ProductCount = Math.Min(extras.GetProductIds().Count, NopwaraMegaMenuDefaults.MAX_PRODUCTS);
+        if (model.HasProducts)
         {
-            var products = (await _productService.GetProductsByIdsAsync(productIds.ToArray()))
-                .OrderBy(product => productIds.IndexOf(product.Id))
-                .ToList();
-            var visible = new List<Product>();
-            foreach (var product in products)
-            {
-                if (product.Published && !product.Deleted && product.VisibleIndividually && _productService.ProductIsAvailable(product)
-                    && await _aclService.AuthorizeAsync(product) && await _storeMappingService.AuthorizeAsync(product))
-                {
-                    visible.Add(product);
-                }
-            }
-
-            model.Products = (await _productModelFactory.PrepareProductOverviewModelsAsync(visible.Take(NopwaraMegaMenuDefaults.MAX_PRODUCTS),
-                productThumbPictureSize: _settings.ProductPictureSize)).ToList();
+            model.ProductsUrl = Url.RouteUrl(NopwaraMegaMenuDefaults.PRODUCTS_ROUTE_NAME, new { key = extras.Key });
             model.ProductsTitle = await _localizationService.GetLocalizedAsync(extras, x => x.ProductsTitle, languageId);
         }
 

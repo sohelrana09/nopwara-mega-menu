@@ -1,0 +1,27 @@
+@model MegaMenuProductsModel
+@using Nop.Core.Domain.Catalog
+@*Featured product cards of a dropdown, returned by NopwaraMegaMenuController.Products into the panel's placeholder*@
+<ul class="grid @(Model.Products.Count == 3 ? "grid-cols-3 gap-3" : "grid-cols-2 gap-4")">
+    @foreach (var product in Model.Products)
+    {
+        var url = await NopUrl.RouteGenericUrlAsync<Product>(new { SeName = product.SeName });
+        var picture = product.PictureModels?.FirstOrDefault();
+        <li>
+            <a href="@url" role="menuitem" class="group/product block rounded-lg p-2 transition-colors hover:bg-slate-50">
+                @if (picture != null)
+                {
+                    <img src="@picture.ImageUrl" alt="@picture.AlternateText" loading="lazy"
+                         class="mb-2 aspect-square w-full rounded-md bg-white object-contain" />
+                }
+                <span class="line-clamp-2 text-sm font-medium text-slate-800 group-hover/product:text-primary-600">@product.Name</span>
+                <span class="mt-1 flex items-baseline gap-2 text-sm">
+                    <span class="font-semibold text-slate-900">@product.ProductPrice.Price</span>
+                    @if (!string.IsNullOrEmpty(product.ProductPrice.OldPrice))
+                    {
+                        <span class="text-xs text-slate-400 line-through">@product.ProductPrice.OldPrice</span>
+                    }
+                </span>
+            </a>
+        </li>
+    }
+</ul>

@@ -37,6 +37,11 @@ public static class NopwaraMegaMenuDefaults
     public const string CONFIGURATION_ROUTE_NAME = "Plugin.Widgets.NopwaraMegaMenu.Configure";
 
     /// <summary>
+    /// Gets the route name of the featured products of a dropdown, loaded when the dropdown first opens
+    /// </summary>
+    public const string PRODUCTS_ROUTE_NAME = "Plugin.Widgets.NopwaraMegaMenu.Products";
+
+    /// <summary>
     /// Gets the system name of the admin menu item (Content management > Mega menu)
     /// </summary>
     public const string ADMIN_MENU_SYSTEM_NAME = "Nopwara mega menu";
