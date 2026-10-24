@@ -3,7 +3,7 @@
   "FriendlyName": "Nopwara mega menu",
   "SystemName": "Widgets.NopwaraMegaMenu",
   "Version": "1.01",
-  "SupportedVersions": [ "5.00" ],
+  "SupportedVersions": [ "4.90" ],
   "Author": "Nopwara",
   "DisplayOrder": 1,
   "FileName": "Nop.Plugin.Widgets.NopwaraMegaMenu.dll",
