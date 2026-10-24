@@ -22,7 +22,13 @@ public record MegaMenuPanelModel : BaseNopModel
 
     public string ProductsTitle { get; set; }
 
-    public IList<ProductOverviewModel> Products { get; set; } = new List<ProductOverviewModel>();
+    /// <summary>
+    /// Gets or sets the number of featured products set in admin; the products themselves are loaded from ProductsUrl
+    /// when the dropdown first opens, so closed dropdowns cost no price calculation
+    /// </summary>
+    public int ProductCount { get; set; }
+
+    public string ProductsUrl { get; set; }
 
     public string ContentTitle { get; set; }
 
@@ -32,5 +38,15 @@ public record MegaMenuPanelModel : BaseNopModel
 
     public bool HasContent => !string.IsNullOrWhiteSpace(ContentHtml);
 
-    public bool IsEmpty => !HasPromo && !Products.Any() && !HasContent;
+    public bool HasProducts => ProductCount > 0;
+
+    public bool IsEmpty => !HasPromo && !HasProducts && !HasContent;
+}
+
+/// <summary>
+/// Represents the featured products of a dropdown (loaded on demand)
+/// </summary>
+public record MegaMenuProductsModel : BaseNopModel
+{
+    public IList<ProductOverviewModel> Products { get; set; } = new List<ProductOverviewModel>();
 }

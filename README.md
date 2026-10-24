@@ -5,7 +5,7 @@ Mega menu extras for the **nopCommerce 5.00 main menu**, drawn by the [Nopwara t
 nopCommerce 5.00 already has a menu builder: Content management → Menus, with category, manufacturer, vendor, topic, product and custom-link items, plus picture-grid or list dropdowns. This plugin doesn't replace it. You keep building the menu there, and add the extras that premium mega menus have:
 
 - **Badges:** "New", "Sale", "Hot"… next to an item, in five colours.
-- **Icons:** 20 line icons (Heroicons) shown before an item's title.
+- **Icons:** 24 line icons (Heroicons) shown before an item's title, including health ones (beaker, plus-circle, shield-check, face-smile).
 - **"View all" links** at the end of a dropdown, with customisable text ("View all {0}").
 - **Full-width dropdowns** for any item, not just picture grids.
 - **Promo banner column:** a picture with a title, a subtitle and a link.
@@ -39,6 +39,7 @@ Or install the whole Nopwara set in one upload with [nopwara-suite](https://gith
 | `NopwaraMegaMenuItem` table | One row per menu item (`MenuItemId`) or generated category (`CategoryId`) with extras. Deleting a core menu item deletes its row. |
 | `MegaMenuModelConsumer` | Listens for core's `ModelPreparedEvent` of the main menu. It puts each item's badge, icon, "View all" and layout into `HttpContext.Items["nopwara.megamenu"]` for the current request. Core caches the menu model and shares it between requests, so it's never modified. |
 | `MegaMenuPanelViewComponent` | Renders the promo, products and content columns in the theme's widget zones `nopwara_megamenu_panel` (dropdowns) and `nopwara_megamenu_panel_mobile` (mobile levels, promo only). |
+| `NopwaraMegaMenuController.Products` | The featured products of a dropdown (`/nopwara-megamenu/products/{key}`). Panels render grey placeholder cards, and the theme loads the real ones the first time the dropdown opens, so closed dropdowns cost no price calculation. Panel pictures likewise use `data-src` until opened. |
 | Admin | Content management → Mega menu: the main menus as trees, plus an edit page per item. Products are picked with core's product picker. Permissions are core's menu permissions. |
 
 Keys used by the theme: `i{menuItemId}` for menu items, `c{categoryId}` for category items core generates.

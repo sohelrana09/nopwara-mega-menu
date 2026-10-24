@@ -18,37 +18,26 @@
     return;
 }
 <div class="nopwara-megamenu-panel flex flex-col gap-6 lg:flex-row lg:gap-8" data-menu-item="@Model.Key">
-    @if (Model.Products.Any())
+    @if (Model.HasProducts)
     {
         <div class="nopwara-megamenu-products min-w-0 lg:w-[26rem] lg:shrink-0">
             @if (!string.IsNullOrWhiteSpace(Model.ProductsTitle))
             {
                 <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">@Model.ProductsTitle</p>
             }
-            <ul class="grid grid-cols-2 gap-4">
-                @foreach (var product in Model.Products)
-                {
-                    var url = await NopUrl.RouteGenericUrlAsync<Product>(new { SeName = product.SeName });
-                    var picture = product.PictureModels?.FirstOrDefault();
-                    <li>
-                        <a href="@url" role="menuitem" class="group/product block rounded-lg p-2 transition-colors hover:bg-slate-50">
-                            @if (picture != null)
-                            {
-                                <img src="@picture.ImageUrl" alt="@picture.AlternateText" loading="lazy"
-                                     class="mb-2 aspect-square w-full rounded-md bg-white object-contain" />
-                            }
-                            <span class="line-clamp-2 text-sm font-medium text-slate-800 group-hover/product:text-primary-600">@product.Name</span>
-                            <span class="mt-1 flex items-baseline gap-2 text-sm">
-                                <span class="font-semibold text-slate-900">@product.ProductPrice.Price</span>
-                                @if (!string.IsNullOrEmpty(product.ProductPrice.OldPrice))
-                                {
-                                    <span class="text-xs text-slate-400 line-through">@product.ProductPrice.OldPrice</span>
-                                }
-                            </span>
-                        </a>
-                    </li>
-                }
-            </ul>
+            @*cards come from ProductsUrl the first time the dropdown opens (nopwaraLoadPanel in the theme); grey cards until then*@
+            <div data-megamenu-products="@Model.ProductsUrl">
+                <ul class="grid @(Model.ProductCount == 3 ? "grid-cols-3 gap-3" : "grid-cols-2 gap-4")" aria-hidden="true">
+                    @for (var i = 0; i < Model.ProductCount; i++)
+                    {
+                        <li class="p-2">
+                            <span class="mb-2 block aspect-square w-full animate-pulse rounded-md bg-slate-100"></span>
+                            <span class="block h-3 w-4/5 animate-pulse rounded bg-slate-100"></span>
+                            <span class="mt-2 block h-3 w-1/3 animate-pulse rounded bg-slate-100"></span>
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
     }
     @if (Model.HasContent)

@@ -19,6 +19,10 @@ public class RouteProvider : IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: NopwaraMegaMenuDefaults.CONFIGURATION_ROUTE_NAME,
             pattern: "Admin/NopwaraMegaMenuAdmin/Configure",
             defaults: new { controller = "NopwaraMegaMenuAdmin", action = "Configure", area = AreaNames.ADMIN });
+
+        endpointRouteBuilder.MapControllerRoute(name: NopwaraMegaMenuDefaults.PRODUCTS_ROUTE_NAME,
+            pattern: "nopwara-megamenu/products/{key}",
+            defaults: new { controller = "NopwaraMegaMenu", action = "Products" });
     }
 
     /// <summary>
