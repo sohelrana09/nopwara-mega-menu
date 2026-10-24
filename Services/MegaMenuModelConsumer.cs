@@ -69,7 +69,11 @@ public class MegaMenuModelConsumer : IConsumer<ModelPreparedEvent<BaseNopModel>>
         }
 
         if (!string.IsNullOrEmpty(extras.Icon) && MegaMenuIcons.Paths.TryGetValue(extras.Icon, out var paths))
+        {
             values["icon"] = string.Join("|", paths);
+            //themes with an icon sprite (Nopwara: Content/icons.svg, symbol "mm-<name>") reference it instead of inlining the paths
+            values["iconName"] = MegaMenuIcons.Paths.Keys.First(key => key.Equals(extras.Icon, StringComparison.OrdinalIgnoreCase));
+        }
 
         if (extras.ShowViewAll && !string.IsNullOrEmpty(item.Url))
         {
