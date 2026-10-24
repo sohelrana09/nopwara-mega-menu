@@ -76,7 +76,8 @@ public class MegaMenuModelConsumer : IConsumer<ModelPreparedEvent<BaseNopModel>>
             var text = await _localizationService.GetLocalizedAsync(extras, x => x.ViewAllText, language.Id);
             if (string.IsNullOrWhiteSpace(text))
                 text = await _localizationService.GetResourceAsync("Plugins.Widgets.NopwaraMegaMenu.ViewAll", language.Id);
-            values["viewAllText"] = string.Format(text, item.Title);
+            //admin-entered text: Replace can't throw on stray braces the way string.Format does
+            values["viewAllText"] = text.Replace("{0}", item.Title);
             values["viewAllUrl"] = item.Url;
         }
 

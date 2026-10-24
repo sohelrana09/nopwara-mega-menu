@@ -37,6 +37,22 @@ public class NopwaraMegaMenuPlugin : BasePlugin, IWidgetPlugin
 
     #endregion
 
+    #region Utilities
+
+    /// <summary>
+    /// Text strings added in version 1.01 (installs get them too; updates add them in UpdateAsync)
+    /// </summary>
+    protected virtual async Task AddResourcesAddedIn101Async()
+    {
+        await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
+        {
+            ["Plugins.Widgets.NopwaraMegaMenu.Fields.PromoUrl.Invalid"] = "Enter a link that starts with / (e.g. /summer-sale) or with http:// or https://.",
+            ["Plugins.Widgets.NopwaraMegaMenu.Fields.ContentHtml.NoPermission"] = "Editing the HTML needs the \"Admin area. Topics. Create, edit, delete\" permission, because it's shown as-is on every page. The current HTML is kept."
+        });
+    }
+
+    #endregion
+
     #region Methods
 
     /// <summary>
@@ -169,8 +185,19 @@ public class NopwaraMegaMenuPlugin : BasePlugin, IWidgetPlugin
             //storefront
             ["Plugins.Widgets.NopwaraMegaMenu.ViewAll"] = "View all {0}"
         });
+        await AddResourcesAddedIn101Async();
 
         await base.InstallAsync();
+    }
+
+    /// <summary>
+    /// Update the plugin
+    /// </summary>
+    public override async Task UpdateAsync(string currentVersion, string targetVersion)
+    {
+        await AddResourcesAddedIn101Async();
+
+        await base.UpdateAsync(currentVersion, targetVersion);
     }
 
     /// <summary>

@@ -79,7 +79,8 @@ public class MegaMenuPanelViewComponent : NopViewComponent
         if (extras.PromoPictureId > 0)
         {
             model.PromoImageUrl = await _pictureService.GetPictureUrlAsync(extras.PromoPictureId, _settings.PromoPictureSize, showDefaultPicture: false);
-            model.PromoUrl = extras.PromoUrl;
+            //rows saved before the URL check existed may still hold an unsafe link
+            model.PromoUrl = MegaMenuUrls.IsSafe(extras.PromoUrl) ? extras.PromoUrl : null;
             model.PromoTitle = await _localizationService.GetLocalizedAsync(extras, x => x.PromoTitle, languageId);
             model.PromoSubtitle = await _localizationService.GetLocalizedAsync(extras, x => x.PromoSubtitle, languageId);
         }
@@ -111,7 +112,8 @@ public class MegaMenuPanelViewComponent : NopViewComponent
         if (extras.ContentTopicId > 0)
         {
             var topic = await _topicService.GetTopicByIdAsync(extras.ContentTopicId);
-            if (topic is { Published: true } && await _aclService.AuthorizeAsync(topic) && await _storeMappingService.AuthorizeAsync(topic))
+            if (topic is { Published: true, IsPasswordProtected: false } && _topicService.TopicIsAvailable(topic)
+                && await _aclService.AuthorizeAsync(topic) && await _storeMappingService.AuthorizeAsync(topic))
             {
                 model.ContentHtml = await _localizationService.GetLocalizedAsync(topic, x => x.Body, languageId);
                 if (string.IsNullOrWhiteSpace(model.ContentTitle))

@@ -114,6 +114,11 @@ public record MegaMenuItemModel : BaseNopEntityModel, ILocalizedModel<MegaMenuIt
     public string ContentTitle { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the admin may edit the HTML (it renders unencoded on every page, so it needs the topics permission)
+    /// </summary>
+    public bool CanEditHtml { get; set; }
+
+    /// <summary>
     /// Gets or sets the chosen products (id + name) for the products list on the edit page
     /// </summary>
     public IList<SelectListItem> SelectedProducts { get; set; } = new List<SelectListItem>();

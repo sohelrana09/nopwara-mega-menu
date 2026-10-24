@@ -54,6 +54,11 @@ public class MegaMenuService
         return GetByKeyAsync(MegaMenuKeys.For(menuItemId, categoryId));
     }
 
+    /// <summary>
+    /// Gets the extras by id straight from the database (not the cached instance), for editing
+    /// </summary>
+    public virtual Task<MegaMenuItem> GetByIdAsync(int id) => _repository.GetByIdAsync(id);
+
     public virtual Task InsertAsync(MegaMenuItem item) => _repository.InsertAsync(item);
 
     public virtual Task UpdateAsync(MegaMenuItem item) => _repository.UpdateAsync(item);

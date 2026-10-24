@@ -34,6 +34,7 @@ public class NopwaraMegaMenuAdminController : BasePluginController
     private readonly IManufacturerService _manufacturerService;
     private readonly IMenuService _menuService;
     private readonly INotificationService _notificationService;
+    private readonly IPermissionService _permissionService;
     private readonly IProductService _productService;
     private readonly ISettingService _settingService;
     private readonly ITopicService _topicService;
@@ -52,6 +53,7 @@ public class NopwaraMegaMenuAdminController : BasePluginController
         IManufacturerService manufacturerService,
         IMenuService menuService,
         INotificationService notificationService,
+        IPermissionService permissionService,
         IProductService productService,
         ISettingService settingService,
         ITopicService topicService,
@@ -66,6 +68,7 @@ public class NopwaraMegaMenuAdminController : BasePluginController
         _manufacturerService = manufacturerService;
         _menuService = menuService;
         _notificationService = notificationService;
+        _permissionService = permissionService;
         _productService = productService;
         _settingService = settingService;
         _topicService = topicService;
@@ -306,6 +309,7 @@ public class NopwaraMegaMenuAdminController : BasePluginController
             locale.ContentTitle = await _localizationService.GetLocalizedAsync(extras, x => x.ContentTitle, languageId, false, false);
         });
 
+        model.CanEditHtml = await _permissionService.AuthorizeAsync(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE);
         await PrepareListsAsync(model);
 
         return View(VIEWS + "Edit.cshtml", model);
@@ -315,10 +319,31 @@ public class NopwaraMegaMenuAdminController : BasePluginController
     [CheckPermission(StandardPermission.ContentManagement.MENU_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Edit(MegaMenuItemModel model, bool continueEditing)
     {
-        if (await GetTargetAsync(model.MenuItemId, model.CategoryId) == null)
+        var target = await GetTargetAsync(model.MenuItemId, model.CategoryId);
+        if (target == null)
             return RedirectToAction("List");
 
-        var extras = await _megaMenuService.GetAsync(model.MenuItemId, model.CategoryId);
+        //edit a fresh copy: the one GetAsync returns is shared through the cache, so a failed save would leak into the storefront
+        var cached = await _megaMenuService.GetAsync(model.MenuItemId, model.CategoryId);
+        var extras = cached == null ? null : await _megaMenuService.GetByIdAsync(cached.Id);
+
+        //the HTML renders unencoded on every page: without the topics permission keep what's saved
+        model.CanEditHtml = await _permissionService.AuthorizeAsync(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE);
+        if (!model.CanEditHtml)
+        {
+            model.ContentHtml = extras?.ContentHtml;
+            foreach (var locale in model.Locales)
+                locale.ContentHtml = extras == null ? null : await _localizationService.GetLocalizedAsync(extras, x => x.ContentHtml, locale.LanguageId, false, false);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            model.MenuItemTitle = target.Value.title;
+            model.MenuItemType = target.Value.type;
+            await PrepareListsAsync(model);
+
+            return View(VIEWS + "Edit.cshtml", model);
+        }
 
         //nothing set: no row (the item renders as plain core)
         if (IsEmpty(model))

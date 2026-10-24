@@ -16,6 +16,8 @@
     <input asp-for="CategoryId" type="hidden" />
     <input asp-for="ProductIds" type="hidden" />
 
+    <div asp-validation-summary="All"></div>
+
     <div class="content-header clearfix">
         <h1 class="float-left">
             @title
@@ -196,6 +198,10 @@
 
                     <nop-tab asp-name="tab-content" asp-title="@T("Plugins.Widgets.NopwaraMegaMenu.Tab.Content")">
                         <div class="card-body">
+                            @if (!Model.CanEditHtml)
+                            {
+                                <div class="callout bg-gray-light no-margin">@T("Plugins.Widgets.NopwaraMegaMenu.Fields.ContentHtml.NoPermission")</div>
+                            }
                             <div class="form-group row">
                                 <div class="col-md-3"><nop-label asp-for="ContentTopicId" /></div>
                                 <div class="col-md-9"><nop-select asp-for="ContentTopicId" asp-items="Model.AvailableTopics" /></div>
@@ -206,10 +212,13 @@
                                     <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].ContentTitle" /></div>
                                     <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].ContentTitle" /></div>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].ContentHtml" /></div>
-                                    <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].ContentHtml" asp-template="RichEditor" /></div>
-                                </div>
+                                @if (Model.CanEditHtml)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-md-3"><nop-label asp-for="@Model.Locales[item].ContentHtml" /></div>
+                                        <div class="col-md-9"><nop-editor asp-for="@Model.Locales[item].ContentHtml" asp-template="RichEditor" /></div>
+                                    </div>
+                                }
                                 <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
                             </div>,
                             @<div>
@@ -217,10 +226,13 @@
                                     <div class="col-md-3"><nop-label asp-for="ContentTitle" /></div>
                                     <div class="col-md-9"><nop-editor asp-for="ContentTitle" /></div>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-md-3"><nop-label asp-for="ContentHtml" /></div>
-                                    <div class="col-md-9"><nop-editor asp-for="ContentHtml" asp-template="RichEditor" /></div>
-                                </div>
+                                @if (Model.CanEditHtml)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-md-3"><nop-label asp-for="ContentHtml" /></div>
+                                        <div class="col-md-9"><nop-editor asp-for="ContentHtml" asp-template="RichEditor" /></div>
+                                    </div>
+                                }
                             </div>))
                         </div>
                     </nop-tab>

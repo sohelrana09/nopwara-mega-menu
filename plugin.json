@@ -2,7 +2,7 @@
   "Group": "Widgets",
   "FriendlyName": "Nopwara mega menu",
   "SystemName": "Widgets.NopwaraMegaMenu",
-  "Version": "1.00",
+  "Version": "1.01",
   "SupportedVersions": [ "5.00" ],
   "Author": "Nopwara",
   "DisplayOrder": 1,
